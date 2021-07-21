@@ -1,0 +1,30 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.4.0",
+    "hardhat": "^2.4.3"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "dotenv": "^10.0.0",
+    "ethers": "^5.4.1"
+  },
+  "version": "1.0.0",
+  "description": "provide liquidity to a liquidity pool on uniswap with just 1 token",
+  "main": "hardhat.config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "defi",
+    "uniswap",
+    "erc20"
+  ],
+  "author": "Carlos Alvarez",
+  "license": "ISC"
+}
