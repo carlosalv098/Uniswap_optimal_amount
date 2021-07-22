@@ -8,11 +8,12 @@
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@openzeppelin/contracts": "^4.2.0",
     "dotenv": "^10.0.0",
     "ethers": "^5.4.1"
   },
   "version": "1.0.0",
-  "description": "provide liquidity to a liquidity pool on uniswap with just 1 token",
+  "description": "provide liquidity to a liquidity pool on uniswap with just 1 of the 2 tokens",
   "main": "hardhat.config.js",
   "directories": {
     "test": "test"
