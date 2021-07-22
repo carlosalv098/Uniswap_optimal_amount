@@ -12,8 +12,9 @@ contract UniswapOptimal {
 
     address private constant FACTORY = 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f;
     address private constant ROUTER = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
-    address private constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address private constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
 
+    
     function sqrt(uint y) internal pure returns (uint z) {
         if (y > 3) {
             z = y;
@@ -40,7 +41,43 @@ contract UniswapOptimal {
         return (sqrt(r.mul(r.mul(3988009) + a.mul(3988000))).sub(r.mul(1997))) / 1994;
     }
 
+    function _addLiquidity(address _tokenA, address _tokenB) internal {
+
+        // get balances of tokenA and tokenB in this contract
+        uint balance_tokenA = IERC20(_tokenA).balanceOf(address(this));
+        uint balance_tokenB = IERC20(_tokenB).balanceOf(address(this));
+
+        // approve ROUTER to spend both balances
+        IERC20(_tokenA).approve(ROUTER, balance_tokenA);
+        IERC20(_tokenB).approve(ROUTER, balance_tokenB);
+
+        // call addLiquidity function on UniswapV2Router, this add liquidity to an ERC20 - ERC20 pool
+        IUniswapV2Router(ROUTER).addLiquidity(
+            _tokenA, 
+            _tokenB, 
+            balance_tokenA, 
+            balance_tokenB, 
+            0, 
+            0, 
+            address(this), 
+            block.timestamp);
+    }
+
+    function _swap(address _from, address _to, uint _amount) internal {
+        IERC20(_from).approve(ROUTER, _amount);
+        
+        address[] memory path = new address[](2);
+        path[0] = _from;
+        path[1] = _to;
+
+        IUniswapV2Router(ROUTER).swapExactTokensForTokens(_amount, 1, path, address(this), block.timestamp);
+    }
+
     function swapAndAddLiquidity(address _tokenA, address _tokenB, uint _tokenA_amount) external {
+
+        // etiher tokenA or tokenB has to be USDC
+        require(_tokenA == USDC || _tokenB == USDC, 'neither of the tokens is USDC');
+
         // transfer token A to this contract
         IERC20(_tokenA).transferFrom(msg.sender, address(this), _tokenA_amount);
 
@@ -67,35 +104,7 @@ contract UniswapOptimal {
         _addLiquidity(_tokenA, _tokenB);    
     }    
 
-    function _swap(address _from, address _to, uint _amount) internal {
-        IERC20(_from).approve(ROUTER, _amount);
-        
-        address[] memory path = new address[](2);
-        path[0] = _from;
-        path[1] = _to;
-
-        IUniswapV2Router(ROUTER).swapExactTokensForTokens(_amount, 1, path, address(this), block.timestamp);
-    }
-
-    function _addLiquidity(address _tokenA, address _tokenB) internal {
-
-        // get balances of tokenA and tokenB in this contract
-        uint balance_tokenA = IERC20(_tokenA).balanceOf(address(this));
-        uint balance_tokenB = IERC20(_tokenB).balanceOf(address(this));
-
-        // approve ROUTER to spend both balances
-        IERC20(_tokenA).approve(ROUTER, balance_tokenA);
-        IERC20(_tokenB).approve(ROUTER, balance_tokenB);
-
-        // call addLiquidity function on UniswapV2Router, this add liquidity to an ERC20 - ERC20 pool
-        IUniswapV2Router(ROUTER).addLiquidity(
-            _tokenA, 
-            _tokenB, 
-            balance_tokenA, 
-            balance_tokenB, 
-            0, 
-            0, 
-            address(this), 
-            block.timestamp);
+    function getPair(address _tokenA, address _tokenB) external view returns (address) {
+        return IUniswapV2Factory(FACTORY).getPair(_tokenA, _tokenB);
     }
 }
